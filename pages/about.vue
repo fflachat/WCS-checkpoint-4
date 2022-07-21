@@ -6,14 +6,15 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import ContactForm from '../components/contact-form.vue'
 import AboutUs from '../components/about-us.vue'
 
-export default Vue.extend({
+export default {
     name: "IndexPage",
-    components: { ContactForm, AboutUs }
-})
+    components: { ContactForm, AboutUs },
+      auth: false
+
+}
 </script>
 
 <style scoped>

@@ -7,11 +7,11 @@ Aut voluptas laudantium hic asperiores ducimus est atque amet ut distinctio ipsu
 </template>
 
 <script>
-import Vue from 'vue'
-
-export default Vue.extend({
+export default {
   name: 'IndexPage',
-})
+    auth: false,
+
+}
 </script>
 
 <style scoped>

@@ -1,6 +1,9 @@
 // index.js
-import express from 'express'
-import { PrismaClient } from '@prisma/client'
+const express = require('express')
+const createError = require('http-errors')
+const { PrismaClient } = require('@prisma/client')
+const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
 
 const prisma = new PrismaClient()
 const app = express()
@@ -15,10 +18,75 @@ export default {
   handler: app,
 }
 
-// ------------------------------------------------------------- User API -----------------------------------------------------------------
+// ------------------------------------------------------------- Auth API -----------------------------------------------------------------
+// Register Admin
+app.post(`/admin/register`, async (req, res) => {
+  const { email, password } = req.body.login
+  const result = await prisma.admin.create({
+    data: {
+      email,
+      password: bcrypt.hashSync(password, 8),
+    },
+  })
+  res.json(result)
+})
+
+// login Admin
+
+app.post(`/login`, async (req, res) => {
+  const { email, password } = req.body
+  const admin = await prisma.admin.findUnique({
+    where: {
+      email,
+    },
+  })
+
+  if (!admin) {
+    throw createError.NotFound('User not registered')
+  }
+
+  const checkPassword = bcrypt.compareSync(password, admin.password)
+  if (!checkPassword)
+    throw createError.Unauthorized('Email address or password not valid')
+
+  delete admin.password
+  const jwToken = jwt.sign(admin, process.env.PRIVATE_TOKEN_KEY)
+  await prisma.token.create({
+    data: {
+      token: jwToken,
+      ownerId: admin.id,
+    },
+  })
+  return { admin, jwToken }
+})
+
+// get one admin
+app.get(`/admin`, async (req, res) => {
+  const { email } = req.body
+  const admin = await prisma.admin.findUnique({
+    where: {
+      email,
+    },
+  })
+  res.json(admin)
+})
+
+// ------------------------------------------------------------- Access Token API -----------------------------------------------------------------
+
+// create new access token
+app.post(`/token`, async (req, res) => {
+  const result = await prisma.user.create({
+    data: {
+      email: req.body.email,
+    },
+  })
+  res.json(result)
+})
+
+// ------------------------------------------------------------- Email Newsletters API -----------------------------------------------------------------
 
 // Register USER for Newsletter
-app.post(`/user`, async (req, res) => {
+app.post(`/newsletter`, async (req, res) => {
   const result = await prisma.user.create({
     data: {
       email: req.body.email,
@@ -28,20 +96,8 @@ app.post(`/user`, async (req, res) => {
 })
 
 // Get list of USER
-app.get(`/user`, async (req, res) => {
+app.get(`/newsletter`, async (req, res) => {
   const result = await prisma.user.findMany()
-  res.json(result)
-})
-
-// ------------------------------------------------------------- Admin API -----------------------------------------------------------------
-
-// Register new ADMIN
-app.post(`/admin`, async (req, res) => {
-  const result = await prisma.user.create({
-    data: {
-      email: req.body.email,
-    },
-  })
   res.json(result)
 })
 
@@ -66,7 +122,7 @@ app.post('/article', async (req, res) => {
 
 // Get drafts
 app.get('/article/drafts', async (req, res) => {
-  const articles = await prisma.post.findMany({
+  const articles = await prisma.article.findMany({
     where: { published: false },
     include: { author: true },
   })
@@ -98,7 +154,7 @@ app.put('/article/publish/:id', async (req, res) => {
 })
 
 // Get all Article published
-app.get('/article/feed', async (req, res) => {
+app.get('/article', async (req, res) => {
   const articles = await prisma.article.findMany({
     where: { published: true },
     include: { author: true },
@@ -148,7 +204,7 @@ app.get('/article/filter', async (req, res) => {
 
 // Creating an video
 app.post('/video', async (req, res) => {
-  const { title, imageURL, tags, summary, content, author } = req.body
+  const { title, imageURL, tags, summary, content, authorId } = req.body
 
   const video = await prisma.video.create({
     data: {
@@ -157,7 +213,7 @@ app.post('/video', async (req, res) => {
       tags,
       summary,
       content,
-      author,
+      authorId,
     },
   })
   res.status(200).json(video)
@@ -165,7 +221,7 @@ app.post('/video', async (req, res) => {
 
 // Get drafts
 app.get('/video/drafts', async (req, res) => {
-  const videos = await prisma.post.findMany({
+  const videos = await prisma.video.findMany({
     where: { published: false },
     include: { author: true },
   })
@@ -197,7 +253,7 @@ app.put('/video/publish/:id', async (req, res) => {
 })
 
 // Get all video published
-app.get('/video/feed', async (req, res) => {
+app.get('/video', async (req, res) => {
   const videos = await prisma.video.findMany({
     where: { published: true },
     include: { author: true },

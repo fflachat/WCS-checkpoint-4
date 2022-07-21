@@ -6,13 +6,29 @@
 </template>
 
 <script>
-import Vue from 'vue'
+import axios from 'axios';
 import SearchBar from '~/components/search-bar.vue'
 
-export default Vue.extend({
-    name: "IndexPage",
-    components: { SearchBar }
-})
+export default {
+    name: "VideosPage",
+    components: { SearchBar },
+      data() {
+    return {
+      feed: [],
+    }
+    },
+    auth: false,
+        mounted() {
+      this.getFeed();
+  },
+  methods: {
+          getFeed() {
+              axios.get('api/video').then((response) => {
+                this.feed = response.data;
+              })}
+        },
+
+}
 </script>
 
 <style scoped>

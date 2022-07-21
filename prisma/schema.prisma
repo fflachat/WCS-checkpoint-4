@@ -37,13 +37,22 @@ model Video {
   authorId  Int?
 }
 
+model Token {
+  id        Int      @id @default(autoincrement())
+  token     String
+  createdAt DateTime @default(now())
+  owner     Admin?   @relation(fields: [ownerId], references: [id])
+  ownerId   Int?
+}
+
 model Admin {
   id           Int       @id @default(autoincrement())
   email        String    @unique
-  hashPassword String
+  password     String
   name         String?
   articles     Article[]
   videos       Video[]
+  accessTokens Token[]
 }
 
 model User {

@@ -1,30 +1,34 @@
 <template>
   <div>
     <h1>Création d'un article :</h1>
-    <form class="container">
+    <form class="container"  @submit="createArticle">
       <div class="article">
               <b-field label="Corps de l'article" :label-position="labelPosition" >
-        <b-input maxlength="2000" type="textarea" class="text-article"></b-input>
+        <b-input v-model="article.content" maxlength="2000" type="textarea"  class="text-article" ></b-input>
       </b-field>
       </div>
 
 
       <div>
         <b-field label="Titre" :label-position="labelPosition">
-          <b-input value="Mon titre"></b-input>
+          <b-input v-model="article.title" value="Mon titre"></b-input>
         </b-field>
          <b-field label="Résumé" :label-position="labelPosition">
-        <b-input maxlength="200" type="textarea"></b-input>
+        <b-input v-model="article.summary" maxlength="200" type="textarea"></b-input>
       </b-field>
-      <UploadImage />
+       <b-field label="Url de l'illustration" :label-position="labelPosition">
+            <b-input v-model="article.imageURL" placeholder="image url" type="url"></b-input>
+        </b-field>
+        <UploadImage />
       <b-field label="Ajouter des Tags" :label-position="labelPosition">
             <b-taginput
-                :value="[]"
+                v-model="article.tags"
                 ellipsis
                 icon="label"
                 placeholder="Ajouter un tag">
             </b-taginput>
         </b-field>
+        <button type="submit">Créer test</button>
         <b-button rounded>Créer</b-button>
       </div>
     </form>
@@ -32,16 +36,31 @@
 </template>
 
 <script>
+import axios from 'axios';
 import UploadImage from '~/components/upload-image.vue'
 
 export default {
     name: "CreateArticlePage",
     components: { UploadImage },
     layout: "admin",
+    auth: false,
     data() {
         return {
+            article: {
+                title:"",
+                imageURL:"",
+                tags:[],
+                summary:"",
+                content:"",
+                authorId:1,
+            },
             labelPosition: "on-border"
         };
+    },
+    methods: {
+      createArticle() {
+        axios.post('/api/article', this.article)
+      }
     },
 }
 </script>
