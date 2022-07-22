@@ -9,8 +9,8 @@
     <div class="card-list">
 
       <div v-for="article in articles" :key="article.id">
-       <NuxtLink :to="`/article/${article.id}`">
-        <ArticleCard  :data="article"/>
+       <NuxtLink :to="`/admin/article/${article.id}`">
+        <ArticleCardAdmin  :data="article"/>
        </NuxtLink>
       </div>
 
@@ -21,11 +21,11 @@
 <script>
 import axios from 'axios';
 import SearchBar from '~/components/search-bar.vue'
-import ArticleCard from '~/components/article-card.vue';
+import ArticleCardAdmin from '~/components/article-card.vue';
 
 export default {
     name: "IndexPage",
-    components: { SearchBar, ArticleCard },
+    components: { SearchBar, ArticleCardAdmin },
     layout: "admin",
     data() {
       return {

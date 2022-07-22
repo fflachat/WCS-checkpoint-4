@@ -28,7 +28,8 @@
                 placeholder="Ajouter un tag">
             </b-taginput>
         </b-field>
-        <b-button native-type="submit" rounded>Créer</b-button>
+                  <b-button native-type="submit" rounded>Créer</b-button>
+
       </div>
     </form>
   </div>
@@ -59,6 +60,7 @@ export default {
     methods: {
       createArticle() {
         axios.post('/api/article', this.article)
+
       }
     },
 }

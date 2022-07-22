@@ -11,9 +11,6 @@
             </b-navbar-item>
         </template>
         <template #start>
-            <b-navbar-item href="/admin">
-                Home
-            </b-navbar-item>
             <b-navbar-item href="/admin/article">
                 Articles
             </b-navbar-item>

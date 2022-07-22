@@ -44,19 +44,19 @@ export default {
     strategies: {
       local: {
         token: {
-          property: 'token',
+          property: 'data.token',
           global: true,
           // required: true,
-          type: '',
+          type: 'Bearer',
         },
         user: {
-          property: 'user',
-          // autoFetch: true
+          property: false,
+          autoFetch: false,
         },
         endpoints: {
           login: { url: '/api/login', method: 'post' },
           logout: false, // { url: '/api/logout', method: 'post' },
-          user: { url: '/api/admin', method: 'get' },
+          user: false, // { url: '/api/admin', method: 'get' },
         },
       },
     },

@@ -3,12 +3,12 @@
         <b-field 
         label="Username"
            >
-            <b-input v-model="login.email" value="florent.flachat@gmail.com" placeholder="florent.flachat@gmail.com" maxlength="30"  ></b-input>
+            <b-input v-model="login.email" value="" placeholder="email" maxlength="30"  ></b-input>
         </b-field>
 
         <b-field 
         label="Password">
-            <b-input v-model="login.password"  value="adminFOMO1!" placeholder="adminFOMO1!" type="password" maxlength="30"></b-input>
+            <b-input v-model="login.password"  value="" placeholder="mdp" type="password" maxlength="30"></b-input>
         </b-field>
         <button>Log In</button>
     </form>

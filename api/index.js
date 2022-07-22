@@ -21,7 +21,7 @@ export default {
 // ------------------------------------------------------------- Auth API -----------------------------------------------------------------
 // Register Admin
 app.post(`/admin/register`, async (req, res) => {
-  const { email, password } = req.body.login
+  const { email, password } = req.body
   const result = await prisma.admin.create({
     data: {
       email,
@@ -35,40 +35,40 @@ app.post(`/admin/register`, async (req, res) => {
 
 app.post(`/login`, async (req, res) => {
   const { email, password } = req.body
-  const admin = await prisma.admin.findUnique({
+  const user = await prisma.admin.findUnique({
     where: {
       email,
     },
   })
 
-  if (!admin) {
+  if (!user) {
     throw createError.NotFound('User not registered')
   }
 
-  const checkPassword = bcrypt.compareSync(password, admin.password)
+  const checkPassword = bcrypt.compareSync(password, user.password)
   if (!checkPassword)
     throw createError.Unauthorized('Email address or password not valid')
 
-  delete admin.password
-  const jwToken = jwt.sign(admin, process.env.PRIVATE_TOKEN_KEY)
+  delete user.password
+  const jwToken = jwt.sign(user, process.env.PRIVATE_TOKEN_KEY)
   await prisma.token.create({
     data: {
       token: jwToken,
-      ownerId: admin.id,
+      ownerId: user.id,
     },
   })
-  res.json({ ...admin, token: jwToken })
+  const data = { user, token: jwToken }
+  res.json({ data })
 })
 
 // get one admin
 app.get(`/admin`, async (req, res) => {
-  const { email } = req.body
-  const admin = await prisma.admin.findUnique({
-    where: {
-      email,
-    },
+  console.log(req.body)
+  const { user, token } = req.body
+  const data = await prisma.admin.findUnique({
+    where: { id: Number(user.id), token },
   })
-  res.json(admin)
+  res.json(data)
 })
 
 // ------------------------------------------------------------- Access Token API -----------------------------------------------------------------
@@ -140,11 +140,12 @@ app.get('/article/all/:id', async (req, res) => {
 // Publish an ARTICLE
 app.put('/article/publish/:id', async (req, res) => {
   const { id } = req.params
+  const { published } = req.body
   const article = await prisma.article.update({
     where: {
       id: Number(id),
     },
-    data: { published: true },
+    data: { published },
   })
   res.json(article)
 })
@@ -162,7 +163,6 @@ app.get('/article/publish/:id', async (req, res) => {
 
 // Get all Article published
 app.get('/article/publish', async (req, res) => {
-  console.log('test')
   const articles = await prisma.article.findMany({
     where: { published: true },
     include: { author: true },
