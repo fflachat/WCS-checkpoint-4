@@ -57,7 +57,7 @@ app.post(`/login`, async (req, res) => {
       ownerId: admin.id,
     },
   })
-  return { admin, jwToken }
+  res.json({ ...admin, token: jwToken })
 })
 
 // get one admin
@@ -121,22 +121,18 @@ app.post('/article', async (req, res) => {
 })
 
 // Get drafts
-app.get('/article/drafts', async (req, res) => {
-  const articles = await prisma.article.findMany({
-    where: { published: false },
-    include: { author: true },
-  })
+app.get('/article', async (req, res) => {
+  const articles = await prisma.article.findMany()
   res.json(articles)
 })
 
 // Get Article by Id
-app.get('/article/:id', async (req, res) => {
+app.get('/article/all/:id', async (req, res) => {
   const { id } = req.params
   const article = await prisma.article.findUnique({
     where: {
       id: Number(id),
     },
-    include: { author: true },
   })
   res.json(article)
 })
@@ -153,8 +149,20 @@ app.put('/article/publish/:id', async (req, res) => {
   res.json(article)
 })
 
+// get one Published ARTICLE
+app.get('/article/publish/:id', async (req, res) => {
+  const { id } = req.params
+  const article = await prisma.article.findUnique({
+    where: {
+      id: Number(id),
+    },
+  })
+  res.json(article)
+})
+
 // Get all Article published
-app.get('/article', async (req, res) => {
+app.get('/article/publish', async (req, res) => {
+  console.log('test')
   const articles = await prisma.article.findMany({
     where: { published: true },
     include: { author: true },
@@ -174,9 +182,9 @@ app.delete(`/article/:id`, async (req, res) => {
 })
 
 // Search for an Article
-app.get('/article/filter', async (req, res) => {
-  const { searchString } = req.query
-  const draftArticles = await prisma.article.findMany({
+app.get('/article/filter/:searchString', async (req, res) => {
+  const { searchString } = req.params
+  const filterArticles = await prisma.article.findMany({
     where: {
       OR: [
         {
@@ -191,28 +199,30 @@ app.get('/article/filter', async (req, res) => {
         },
         {
           tags: {
-            contains: searchString,
+            equals: searchString,
           },
         },
       ],
+      NOT: {
+        published: false,
+      },
     },
   })
-  res.send(draftArticles)
+  res.send(filterArticles)
 })
 
 // ------------------------------------------------------------- Videos API -----------------------------------------------------------------
 
 // Creating an video
 app.post('/video', async (req, res) => {
-  const { title, imageURL, tags, summary, content, authorId } = req.body
+  const { title, videoURL, tags, summary, authorId } = req.body
 
   const video = await prisma.video.create({
     data: {
       title,
-      imageURL,
+      videoURL,
       tags,
       summary,
-      content,
       authorId,
     },
   })
@@ -220,22 +230,18 @@ app.post('/video', async (req, res) => {
 })
 
 // Get drafts
-app.get('/video/drafts', async (req, res) => {
-  const videos = await prisma.video.findMany({
-    where: { published: false },
-    include: { author: true },
-  })
+app.get('/video', async (req, res) => {
+  const videos = await prisma.video.findMany()
   res.json(videos)
 })
 
 // Get video by Id
-app.get('/video/:id', async (req, res) => {
+app.get('/video/all/:id', async (req, res) => {
   const { id } = req.params
   const video = await prisma.video.findUnique({
     where: {
       id: Number(id),
     },
-    include: { author: true },
   })
   res.json(video)
 })
@@ -252,8 +258,19 @@ app.put('/video/publish/:id', async (req, res) => {
   res.json(video)
 })
 
+// get one Published video
+app.get('/video/publish/:id', async (req, res) => {
+  const { id } = req.params
+  const video = await prisma.video.findUnique({
+    where: {
+      id: Number(id),
+    },
+  })
+  res.json(video)
+})
+
 // Get all video published
-app.get('/video', async (req, res) => {
+app.get('/video/publish', async (req, res) => {
   const videos = await prisma.video.findMany({
     where: { published: true },
     include: { author: true },

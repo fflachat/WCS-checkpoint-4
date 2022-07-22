@@ -28,8 +28,7 @@
                 placeholder="Ajouter un tag">
             </b-taginput>
         </b-field>
-        <button type="submit">Créer test</button>
-        <b-button rounded>Créer</b-button>
+        <b-button native-type="submit" rounded>Créer</b-button>
       </div>
     </form>
   </div>

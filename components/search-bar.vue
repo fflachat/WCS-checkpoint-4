@@ -3,15 +3,13 @@
 
            <b-field >
             <b-autocomplete
-                v-model="name"
+                v-model="search"
                 rounded
-                :data="filteredDataArray"
                 placeholder="ma recherche"
                 icon="magnify"
                 clearable
-                @select="option => selected = option">
-                <template #empty>No results found</template>
-            </b-autocomplete>
+                :change="updateSearch()"
+               />
         </b-field>  
         </form>
        
@@ -21,20 +19,12 @@
     export default {
         data() {
             return {
-                data: [
-                ],
-                name: '',
-                selected: null
+                search:''
             }
         },
-        computed: {
-            filteredDataArray() {
-                return this.data.filter((option) => {
-                    return option
-                        .toString()
-                        .toLowerCase()
-                        .includes(this.name.toLowerCase()) > 0
-                })
+        methods:{
+            updateSearch(){
+                this.$emit('update-search', this.search)
             }
         }
     }

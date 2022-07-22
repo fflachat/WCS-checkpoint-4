@@ -4,25 +4,25 @@
     <div class="container">
       <div class="previz"></div>
 
-      <form class="form">
+      <form class="form" @submit="createVideo">
         <b-field label="Titre" :label-position="labelPosition">
-          <b-input value="Mon titre"></b-input>
+          <b-input v-model="video.title"></b-input>
         </b-field>
          <b-field label="Url de la vidéo" :label-position="labelPosition">
-            <b-input placeholder="www.youtube.com/mavideo" type="url"></b-input>
+            <b-input v-model="video.videoURL" placeholder="www.youtube.com/mavideo" type="url"></b-input>
         </b-field>
-         <b-field label="Description" :label-position="labelPosition">
-        <b-input maxlength="200" type="textarea"></b-input>
+         <b-field  label="Description" :label-position="labelPosition">
+        <b-input v-model="video.summary" maxlength="200" type="textarea"></b-input>
       </b-field>
       <b-field label="Ajouter des Tags" :label-position="labelPosition">
             <b-taginput
-                :value="[]"
+                v-model="video.tags"                
                 ellipsis
                 icon="label"
                 placeholder="Ajouter un tag">
             </b-taginput>
         </b-field>
-        <b-button rounded>Créer</b-button>
+        <b-button native-type="submit" rounded>Créer</b-button>
       </form>
 
     </div>
@@ -31,14 +31,30 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'CreateVideoPage',
   layout: 'admin',
-  data() {
+   auth: false,
+    data() {
         return {
-            labelPosition: 'on-border'
-        }
-    }
+            video: {
+                title:"",
+                imageURL:"",
+                tags:[],
+                summary:"",
+                content:"",
+                authorId:1,
+            },
+            labelPosition: "on-border"
+        };
+    },
+    methods: {
+      createVideo() {
+        axios.post('/api/video', this.video)
+      }
+    },
 }
 </script>
 

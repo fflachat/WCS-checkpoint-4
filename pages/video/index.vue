@@ -2,6 +2,9 @@
 <div>
   <h1>Vidéos : </h1>
   <SearchBar />
+  <div v-for="video in feed" :key="video.id">
+    <h2>{{video.title}}</h2>
+    </div>
 </div>
 </template>
 
@@ -23,7 +26,7 @@ export default {
   },
   methods: {
           getFeed() {
-              axios.get('api/video').then((response) => {
+              axios.get('api/video/publish/').then((response) => {
                 this.feed = response.data;
               })}
         },

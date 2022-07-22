@@ -15,8 +15,8 @@ model Article {
   title     String
   imageURL  String
   tags      Json
-  summary   String
-  content   String?
+  summary   String   @db.Text
+  content   String?  @db.MediumText
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   published Boolean  @default(false)
@@ -29,7 +29,7 @@ model Video {
   title     String
   videoURL  String
   tags      Json
-  summary   String
+  summary   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   published Boolean  @default(false)
